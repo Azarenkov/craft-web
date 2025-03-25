@@ -12,7 +12,9 @@ func main() {
 	artService := services.NewAsciiArtService(parser)
 
 	mux := http.NewServeMux()
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("public"))))
 
+	controllers.NewIndexController(mux)
 	controllers.NewArticleController(mux, artService)
 
 	port := ":8080"
