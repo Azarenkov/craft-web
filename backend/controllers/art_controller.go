@@ -25,7 +25,7 @@ func NewArticleController(mux *http.ServeMux, svc ArtServiceInterface) {
 	controller := &ArtController{
 		artService: svc,
 	}
-	mux.HandleFunc("/create_art", controller.CreateArt)
+	mux.HandleFunc("/api/create_art", controller.CreateArt)
 }
 
 func (a *ArtController) CreateArt(w http.ResponseWriter, r *http.Request) {

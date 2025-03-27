@@ -5,21 +5,42 @@ import (
 	"ascii-art-web/infrasructure"
 	"ascii-art-web/services"
 	"net/http"
+	"os"
 )
 
 func main() {
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	parser := infrasructure.NewParser()
 	artService := services.NewAsciiArtService(parser)
 
 	mux := http.NewServeMux()
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("public"))))
 
-	controllers.NewIndexController(mux)
+	mux.HandleFunc("/static/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/static/" {
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+		http.StripPrefix("/static/", http.FileServer(http.Dir("public/static"))).ServeHTTP(w, r)
+	})
+
 	controllers.NewArticleController(mux, artService)
 
-	port := ":8080"
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+		http.ServeFile(w, r, "public/index.html")
+	})
+
 	println("Server starting on port", port)
-	err := http.ListenAndServe(port, mux)
+
+	err := http.ListenAndServe(":"+port, mux)
 	if err != nil {
 		panic(err)
 	}

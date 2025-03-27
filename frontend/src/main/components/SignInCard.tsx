@@ -5,12 +5,11 @@ import MuiCard from "@mui/material/Card";
 import Divider from "@mui/material/Divider";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
-import { SitemarkIcon } from "./CustomIcons";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import { MenuItem, Stack } from "@mui/material";
+import { createArt } from "../../api/artApi";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -31,119 +30,123 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export default function SignInCard() {
-  const [age, setAge] = React.useState("");
+  const [text, setText] = React.useState("");
+  const [typeBanner, setTypeBanner] = React.useState("standard");
+  const [artText, setArtText] = React.useState("");
+  const [inputError, setInputError] = React.useState(false);
+  const [inputErrorMessage, setInputErrorMessage] = React.useState("");
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value);
+  const handleChangeText = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setText(event.target.value);
   };
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
-  // const [passwordError, setPasswordError] = React.useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError) {
-      event.preventDefault();
+  const handleChangeType = (event: SelectChangeEvent) => {
+    setTypeBanner(event.target.value);
+  };
+
+  const handleGenerate = async () => {
+    if (!text.trim()) {
+      setInputError(true);
+      setInputErrorMessage("Text is required");
       return;
     }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
 
-  const validateInputs = () => {
-    const text = document.getElementById("text") as HTMLInputElement;
+    setInputError(false);
+    setInputErrorMessage("");
 
-    let isValid = true;
-
-    if (!text.value) {
-      setEmailError(true);
-      setEmailErrorMessage("Text is required");
-      isValid = false;
+    const result = await createArt(typeBanner, text);
+    if (result.output) {
+      setArtText(result.output);
     } else {
-      setEmailError(false);
-      setEmailErrorMessage("");
-    }
+      const errorMessage =
+        result.error && typeof result.error === "string"
+          ? result.error
+          : result.error?.message || "Error generating ASCII art";
 
-    return isValid;
+      setArtText(errorMessage);
+    }
   };
 
   return (
     <Card variant="outlined">
-      <Box sx={{ display: { xs: "flex", md: "none" } }}>
-        <SitemarkIcon />
-      </Box>
-
       <Box
         component="form"
-        onSubmit={handleSubmit}
         noValidate
-        sx={{ display: "flex", flexDirection: "column", width: "100%", gap: 2 }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          gap: 2,
+        }}
       >
-        <Stack
-          direction="row" // Lay out items horizontally
-          spacing={2} // Add spacing between TextField and Select
-          // alignItems="center"
-        >
+        <Stack direction="row" spacing={2}>
           <FormControl sx={{ flex: 1 }}>
-            {" "}
-            {/* Allow TextField to take remaining space */}
-            {/* <FormLabel htmlFor="text">Text</FormLabel> */}
             <TextField
-              id="text"
               type="text"
               name="text"
-              // label="Text"
+              multiline
               placeholder="Your text here"
-              // autoFocus
               required
               fullWidth
               variant="outlined"
-              color={emailError ? "error" : "primary"}
-              error={emailError}
-              helperText={emailError ? emailErrorMessage : " "}
+              color={inputError ? "error" : "primary"}
+              error={inputError}
+              helperText={inputError ? inputErrorMessage : " "}
+              value={text}
+              onChange={handleChangeText}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   height: "55px",
+                  alignItems: "center",
+                  overflow: "auto",
                 },
               }}
             />
           </FormControl>
-          <FormControl variant="filled" sx={{ minWidth: 100 }}>
-            <InputLabel id="demo-simple-select-filled-label">Type</InputLabel>
-            <Select
-              labelId="demo-simple-select-filled-label"
-              id="demo-simple-select-filled"
-              value={age}
-              onChange={handleChange}
-              autoWidth
-            >
-              <MenuItem value={10}>Standard</MenuItem>
-              <MenuItem value={20}>Shadow</MenuItem>
-              <MenuItem value={30}>Thinkertoy</MenuItem>
+          <FormControl variant="filled">
+            <InputLabel>Type</InputLabel>
+            <Select value={typeBanner} onChange={handleChangeType}>
+              <MenuItem value="standard">Standard</MenuItem>
+              <MenuItem value="shadow">Shadow</MenuItem>
+              <MenuItem value="thinkertoy">Thinkertoy</MenuItem>
             </Select>
           </FormControl>
         </Stack>
 
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          onClick={validateInputs}
-        >
+        <Button onClick={handleGenerate} fullWidth variant="contained">
           Generate
         </Button>
       </Box>
       <Divider>Your art</Divider>
-      {/* <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}></Box> */}
-      <Typography
-        component="h1"
-        variant="h4"
-        sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
+
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          height: "150px",
+          border: "1px solid",
+          borderRadius: "4px",
+          overflow: "hidden",
+        }}
       >
-        AA
-      </Typography>
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            overflow: "auto",
+            fontFamily: "monospace",
+            fontSize: "14px",
+            lineHeight: "1.2",
+            whiteSpace: "pre",
+            padding: "8px",
+          }}
+        >
+          {artText}
+        </Box>
+      </Box>
     </Card>
   );
 }

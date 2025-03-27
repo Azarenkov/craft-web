@@ -10,7 +10,9 @@ export default function SignInSide(props: { disableCustomTheme?: boolean }) {
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
-      <ColorModeSelect sx={{ position: "fixed", top: "1rem", right: "1rem" }} />
+      <ColorModeSelect
+        sx={{ position: "absolute", top: "1rem", right: "1rem" }}
+      />
       <Stack
         direction="column"
         component="main"
@@ -18,14 +20,14 @@ export default function SignInSide(props: { disableCustomTheme?: boolean }) {
           {
             justifyContent: "center",
             height: "calc((1 - var(--template-frame-height, 0)) * 100%)",
-            marginTop: "max(40px - var(--template-frame-height, 0px), 0px)",
+            marginTop: "max(200px - var(--template-frame-height, 0px), 0px)",
             minHeight: "100%",
           },
           (theme) => ({
             "&::before": {
               content: '""',
               display: "block",
-              position: "absolute",
+              position: "fixed",
               zIndex: -1,
               inset: 0,
               backgroundImage:
@@ -49,7 +51,7 @@ export default function SignInSide(props: { disableCustomTheme?: boolean }) {
           }}
         >
           <Stack
-            direction={{ xs: "column-reverse", md: "column" }}
+            direction={{ xs: "column-reverse", md: "row" }}
             sx={{
               justifyContent: "center",
               gap: { xs: 6, sm: 12 },
