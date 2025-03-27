@@ -33,5 +33,5 @@ So you can also run the frontend part
 
 ## Developers
 Contacts
-- Alexey
-- Arman
+- [Alexey](https://t.me/azarenkov_alexey)
+- [Arman](https://t.me/Armankz2012)
