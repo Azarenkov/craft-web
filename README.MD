@@ -14,7 +14,10 @@ This is a web application that serves an HTML page where users can send a POST r
 - [React](https://react.dev)
 - [Docker](https://www.docker.com/)
 
-## Deploy
+## Example
+![Example](assets/example.png)
+
+## Usage
 If you need to run this programm local, you should to create .env file in the backend directory with
 
     cd backend
@@ -33,5 +36,5 @@ So you can also run the frontend part
 
 ## Developers
 Contacts
-- [Alexey](https://t.me/azarenkov_alexey)
-- [Arman](https://t.me/Armankz2012)
+- [Alexey]
+- [Arman]
